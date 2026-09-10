@@ -7,6 +7,10 @@
   <meta name="description" content="Harb's Books — Hindi ebooks by Harbhajan Bhanu.">
   <title>Harb's Books — Hindi eBooks</title>
 
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js"></script>
+
   <style>
     :root {
       --bg: #0f0e0c;
@@ -261,6 +265,19 @@
       background: var(--gold2);
       color: #1a140b;
       font-weight: 900;
+      cursor: pointer;
+      transition: .2s transform;
+    }
+
+    .small-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .reader-count {
+      font-size: .85rem;
+      color: var(--gold2);
+      margin-top: 8px;
+      font-weight: 800;
     }
 
     .why {
@@ -525,10 +542,14 @@
                 ₹149
               </div>
 
-              <a class="small-btn" href="#payment">
+              <button class="small-btn" onclick="recordPurchase('safalta-ke-raaste', 149)">
                 BUY NOW
-              </a>
+              </button>
 
+            </div>
+
+            <div class="reader-count">
+              📖 Readers: <span id="count-safalta">0</span>
             </div>
 
           </div>
@@ -568,10 +589,14 @@
                 ₹49
               </div>
 
-              <a class="small-btn" href="#payment">
+              <button class="small-btn" onclick="recordPurchase('samay-patrika', 49)">
                 BUY NOW
-              </a>
+              </button>
 
+            </div>
+
+            <div class="reader-count">
+              📖 Readers: <span id="count-samay">0</span>
             </div>
 
           </div>
@@ -611,10 +636,14 @@
                 ₹149
               </div>
 
-              <a class="small-btn" href="#payment">
+              <button class="small-btn" onclick="recordPurchase('zindagi-ki-sachchi-baatein', 149)">
                 BUY NOW
-              </a>
+              </button>
 
+            </div>
+
+            <div class="reader-count">
+              📖 Readers: <span id="count-zindagi">0</span>
             </div>
 
           </div>
@@ -650,7 +679,7 @@
         <div class="why-card">
           <strong>📱 Digital eBooks</strong>
           <p>
-            Payment के बाद क���ताब आपके फोन पर पढ़ने के
+            Payment के बाद किताब आपके फोन पर पढ़ने के
             लिए उपलब्ध कराई जाती है।
           </p>
         </div>
@@ -853,6 +882,46 @@
   </div>
 
 </footer>
+
+<script>
+  // Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDsL1xw5HuJ5K8v9mK4L5N6O7P8Q9R0S1T",
+    authDomain: "harbs-books.firebaseapp.com",
+    projectId: "harbs-books",
+    storageBucket: "harbs-books.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:abcdef1234567890ghijk"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Fetch and display reader counts
+  const bookIds = ['safalta-ke-raaste', 'samay-patrika', 'zindagi-ki-sachchi-baatein'];
+  const countElements = ['count-safalta', 'count-samay', 'count-zindagi'];
+
+  bookIds.forEach((bookId, index) => {
+    db.ref('purchases/' + bookId).on('value', (snapshot) => {
+      const count = snapshot.val() || 0;
+      document.getElementById(countElements[index]).textContent = count;
+    });
+  });
+
+  // Record purchase and redirect
+  function recordPurchase(bookId, price) {
+    // Increment counter
+    db.ref('purchases/' + bookId).transaction(current => {
+      return (current || 0) + 1;
+    });
+
+    // Redirect to payment section
+    setTimeout(() => {
+      document.getElementById('payment').scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+  }
+</script>
 
 </body>
 </html>
